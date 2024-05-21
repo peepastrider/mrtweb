@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Car hub</h1>
+    <section id="car-section">test</section>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            var origin = window.location.origin;
+            const response = await fetch(`${origin}/api/cars`);
+            if (!reponse.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            var carsec = document.getElementById('car-section');
+
+            data.forEach(car => {
+                carsec.innerHTML += 'e';
+            });
+        });
+    </script>
+</body>
+</html>

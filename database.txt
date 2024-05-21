@@ -1,0 +1,12 @@
+CREATE TABLE Car(
+    CarID int PRIMARY KEY,
+    Manufacturer varchar(30),
+    Model varchar(60),
+    Year varchar(4),
+    Price int,
+    Tier int
+);
+
+INSERT INTO Car VALUES
+(1, 'Nissan', 'Skyline GT-R (R34)', '1999', 6250000, 3),
+(2, 'Mitsubishi', 'Lancer Evolution IX', '2002', 37800000, 3);
