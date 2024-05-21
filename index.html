@@ -4,20 +4,35 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Car hub</h1>
-    <section id="car-section">test</section>
+    <nav>
+        <h1>MRT hub</h1>
+        <ul>
+            <li><a href="index.html">Cars</a></li>
+            <li><a href="tuner.html">Tune</a></li>
+        </ul>
+    </nav>
+    <h1>Cars</h1>
+    <section id="car-section"></section>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            var origin = window.location.origin;
-            const response = await fetch(`${origin}/api/cars`);
-            if (!reponse.ok) {
+            var origin = window.location.hostname;
+            const response = await fetch(`http://127.0.0.1:4500/api/cars`);
+            if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
             var carsec = document.getElementById('car-section');
 
             data.forEach(car => {
-                carsec.innerHTML += 'e';
+                carsec.innerHTML += `
+                <a>
+                    <div class="car">
+                        <h3>${car.Year} ${car.Manufacturer} ${car.Model}</h5>
+                        <h2>${car.Tier}</h2>
+                        <h5>¥${car.Price.toLocaleString()}</h5>
+                    </div>
+                </a>
+                    `;
             });
         });
     </script>

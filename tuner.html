@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <h1>MRT hub</h1>
+        <ul>
+            <li><a href="index.html">Cars</a></li>
+            <li><a href="tuner.html">Tune</a></li>
+        </ul>
+    </nav>
+    <section id="tune-section">
+        <section id="tunebutton">
+            <div data-id="overview">Overview</div>
+            <div data-id="ecu">ECU</div>
+            <div data-id="weightreduction">Weight Reduction</div>
+            <div data-id="brakes">Brake Tuning</div>
+            <div data-id="fitment">Fitment</div>
+            <div data-id="stance">Stance</div>
+            <div data-id="gears">Gears</div>
+            <div data-id="suspension">Suspension</div>
+            <div data-id="steering">Steering</div>
+        </section>
+        <section id="tunescreen">
+            <div>Select a section</div>
+        </section>
+    </section>
+
+    <!-- Templates -->
+    <template id="overview">
+        real
+    </template>
+    <template id="ecu">
+        <section id="upgrades">
+            <div class="selected-button" onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 0</div>
+            <div onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 1</div>
+            <div onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 2</Div>
+            <div onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 3</div>
+        </section>
+        <p id="upgradeDisplay">Stage 0</p>
+    </template>
+    <template id="weightreduction">
+        WR stages
+    </template>
+    <template id="brakes">
+        BR stages + brake bias
+    </template>
+    <template id="fitment">
+        offset
+    </template>
+    <template id="stance">
+        height + camber
+    </template>
+    <template id="gears">
+        Gears + power graph
+    </template>
+    <template id="suspension">
+        Stiffness + damp
+    </template>
+    <template id="steering">
+        agg + ratio
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('#tunebutton div');
+            const screen = document.getElementById('tunescreen');
+
+            buttons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const templateId = button.getAttribute('data-id');
+                        const template = document.getElementById(templateId);
+                        screen.innerHTML = template.innerHTML;
+                    })
+                });
+            });
+        function upgradeDisplay(button) {
+            const label = document.getElementById("upgradeDisplay");
+            label.innerHTML = button.innerHTML;
+        }
+        function selectUpgrade(button) {
+            const buttons = document.querySelectorAll('#upgrades div');
+            buttons.forEach(buttonOld => {
+                if (buttonOld.className == "selected-button")
+                {
+                    buttonOld.className = "";
+                }
+            })
+            button.className = "selected-button";
+        }
+    </script>
+</body>
+</html>

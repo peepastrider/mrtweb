@@ -8,5 +8,13 @@ CREATE TABLE Car(
 );
 
 INSERT INTO Car VALUES
-(1, 'Nissan', 'Skyline GT-R (R34)', '1999', 6250000, 3),
-(2, 'Mitsubishi', 'Lancer Evolution IX', '2002', 37800000, 3);
+(1, 'Nissan', 'Skyline GT-R (R34)', '2002', 6198000, 3),
+(2, 'Nissan', 'Skyline GT-R (R33)', '1995', 5460000, 3),
+(3, 'Nissan', 'Skyline GT-R (R32)', '1994', 5361000, 3),
+(4, 'Mitsubishi', 'Lancer Evolution IX', '2004', 3692000, 3),
+(5, 'Mitsubishi', 'Lancer Evolution VI', '1999', 3225000, 3),
+(6, 'Mitsubishi', 'Lancer Evolution III', '1995', 3010000, 2),
+(7, 'DeTomaso', 'Pantera GT4', '1972', 9245000, 3),
+(8, 'Ferrari', 'F40', '1992', 46501000, 4),
+(9, 'Lamborghini', 'Murclielago SV', '2010', 62000000, 4),
+(10, 'Toyota', 'Prius', '2014', 1334000, 1);

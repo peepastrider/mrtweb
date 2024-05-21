@@ -1,9 +1,10 @@
 const http = require('http');
 const sqlite3 = require('sqlite3').verbose();
 const express = require('express');
+const cors = require('cors');
 
 const app = express();
-const port = 5500;
+const port = 4500;
 
 // Database connection
 const db = new sqlite3.Database('database.db', (err) =>{
@@ -16,6 +17,7 @@ const db = new sqlite3.Database('database.db', (err) =>{
 });
 
 app.use(express.json());
+app.use(cors());
 
 app.use((req, res, next) => {
     console.log(`Received request: ${req.method} ${req.url}`);
