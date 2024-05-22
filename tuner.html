@@ -30,22 +30,36 @@
 
     <!-- Templates -->
     <template id="overview">
-        real
+        <p id="tuneoverview"></p>
+        <div onclick="saveTune()">Save your tune</div>
     </template>
     <template id="ecu">
-        <section id="upgrades">
-            <div class="selected-button" onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 0</div>
-            <div onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 1</div>
-            <div onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 2</Div>
-            <div onmouseenter="upgradeDisplay(this)" onclick="selectUpgrade(this)">Stage 3</div>
+        <section id="upgrades" data-id="ecu">
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">0</div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">1</div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">2</Div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">3</div>
         </section>
-        <p id="upgradeDisplay">Stage 0</p>
+        <p id="upgradeDisplay"></p>
     </template>
     <template id="weightreduction">
-        WR stages
+        <section id="upgrades" data-id="weightreduction">
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">0</div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">1</div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">2</Div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">3</div>
+        </section>
+        <p id="upgradeDisplay"></p>
     </template>
     <template id="brakes">
-        BR stages + brake bias
+        <section id="upgrades" data-id="brakes">
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">0</div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">1</div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">2</Div>
+            <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">3</div>
+        </section>
+        <input class="numericInput" validValue="50" type="text" min="0" max="100" step="1" value="50" required>
+        <p id="upgradeDisplay"></p>
     </template>
     <template id="fitment">
         offset
@@ -64,6 +78,51 @@
     </template>
 
     <script>
+        class Car
+        {
+            year;
+            manufacturer;
+            model;
+            tier;
+            price;
+            weight;
+            peakHP;
+            brakeForce;
+
+            constructor(year, manufacturer, model, tier, price, weight, peakHP, brakeForce)
+            {
+                this.year = year;
+                this.manufacturer = manufacturer;
+                this.model = model;
+                this.tier = tier;
+                this.price = price;
+
+                this.weight = weight;
+                this.peakHP = peakHP;
+                this.brakeForce = brakeForce;
+            }
+        }
+        class Tune
+        {
+            car;
+            ecu = 0;
+            brakes = 0;
+            weightreduction = 0;
+
+            constructor(car)
+            {
+                this.car = car;
+            }
+        }
+
+        const currentCar = new Car(1999, 'Mitsubishi', 'Lancer Evolution VI', 3, 3225000, 2998.287, 293, 130)
+        const currentTune = new Tune(currentCar);
+
+        function saveTune()
+        {
+            console.log('tbd :(')
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const buttons = document.querySelectorAll('#tunebutton div');
             const screen = document.getElementById('tunescreen');
@@ -73,12 +132,131 @@
                         const templateId = button.getAttribute('data-id');
                         const template = document.getElementById(templateId);
                         screen.innerHTML = template.innerHTML;
+                        console.log(currentTune);
+                        enterTuneData();
+                        initializeTemplate();
                     })
                 });
             });
-        function upgradeDisplay(button) {
+
+        function enforceNumericInput(event) {
+            var input = event.target;
+            let value = input.value;
+
+            if (isNaN(value) && value !== "")
+            {
+                console.log('invalid input, resetting to' + input.validValue);
+                input.value = input.validValue;
+            }
+            else
+            {
+                // Remove non-numeric characters (except '-')
+                value = value.replace(/[^\d-]/g, '');
+
+                // Remove leading zeros
+                value = value.replace(/^0+/, '');
+
+                // Parse the value as an integer
+                console.log(value);
+                var intValue = parseInt(value);
+
+                // Ensure it's within the specified range [min, max]
+                intValue = Math.min(Math.max(intValue, parseInt(input.min)), parseInt(input.max))
+
+                // Update the input value
+                input.value = intValue;
+                input.validValue = intValue;
+            }
+        }
+
+        function initializeTemplate()
+        {
+            // Make sure all numeric inputs are fool-proof
+            const numericInputs = document.querySelectorAll('.numericInput');
+            numericInputs.forEach((input) => {
+                input.addEventListener('input', enforceNumericInput);
+            })
+        }
+
+        function enterTuneData()
+        {
+            const upgrades = document.querySelectorAll("#upgrades div");
+            var stage;
+            var category = upgrades[0].parentElement.getAttribute('data-id');
+            switch(category)
+            {
+                case 'ecu':
+                    stage = currentTune.ecu; break;
+                case 'weightreduction':
+                    stage = currentTune.weightreduction; break;
+                case 'brakes':
+                    stage = currentTune.brakes; break;
+            }
+            upgrades.forEach((button) => {
+                if (parseInt(button.innerHTML) == stage)
+                {
+                    button.className = "selected-button";
+                    upgradeDisplay(button, button.parentElement.getAttribute("data-id"));
+                }
+            });
+        }
+        function upgradeDisplay(button, cat) {
             const label = document.getElementById("upgradeDisplay");
-            label.innerHTML = button.innerHTML;
+            const stage = button.innerHTML;
+
+            var stageEffect;
+            var stageLabel;
+            var stageTotal;
+            switch(cat)
+            {
+                case 'ecu':
+                    switch(stage)
+                    {
+                        case '0':
+                            stageEffect = 1.00; break;
+                        case '1':
+                            stageEffect = 1.08; break;
+                        case '2':
+                            stageEffect = 1.11; break;
+                        case '3': 
+                            stageEffect = 1.15; break;
+                    }
+                    stageLabel = Math.round((stageEffect - 1) * 100)+ '% Horsepower increase'; 
+                    stageTotal = Math.round(currentTune.car.peakHP * stageEffect) + ' HP'; break;
+                case 'weightreduction':
+                    switch(stage)
+                    {
+                        case '0':
+                            stageEffect = 1.00; break;
+                        case '1':
+                            stageEffect = 0.89; break;
+                        case '2':
+                            stageEffect = 0.85; break;
+                        case '3': 
+                            stageEffect = 0.80; break;
+                    }
+                    stageLabel = Math.round((1 - stageEffect) * 100) + '% Weight Reduction'; 
+                    stageTotal = Math.round(currentTune.car.weight * stageEffect) + ' lbs'; break;
+                case 'brakes':
+                    switch(stage)
+                    {
+                        case '0':
+                            stageEffect = 1.00; break;
+                        case '1':
+                            stageEffect = 1.33; break;
+                        case '2':
+                            stageEffect = 1.49; break;
+                        case '3': 
+                            stageEffect = 1.66; break;
+                    }
+                    stageLabel = Math.round((stageEffect - 1) * 100) + '% Brake Force increase'; 
+                    stageTotal = Math.round(currentTune.car.brakeForce * stageEffect) + ' Nm'; break;
+            };
+            label.innerHTML = `
+            Stage ${stage}:
+            ${stageLabel}
+            ${stageTotal}
+            ` ;
         }
         function selectUpgrade(button) {
             const buttons = document.querySelectorAll('#upgrades div');
@@ -89,6 +267,20 @@
                 }
             })
             button.className = "selected-button";
+
+            var stage = parseInt(button.innerHTML)
+            switch (button.parentElement.getAttribute("data-id"))
+            {
+                case 'ecu':
+                    console.log('ecu changed to stage ' + stage);
+                    currentTune.ecu = stage; break;
+                case 'weightreduction':
+                    console.log('wr changed to stage ' + stage);
+                    currentTune.weightreduction = stage; break;
+                case 'brakes':
+                    console.log('br changed to stage ' + stage);
+                    currentTune.brakes = stage; break;
+            }
         }
     </script>
 </body>
