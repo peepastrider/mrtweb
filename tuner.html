@@ -58,7 +58,7 @@
             <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">2</Div>
             <div onmouseenter="upgradeDisplay(this, this.parentElement.getAttribute('data-id'))" onclick="selectUpgrade(this)">3</div>
         </section>
-        <input class="numericInput" validValue="50" type="text" min="0" max="100" step="1" value="50" required>
+        <input class="numericInput" tunefield="brakebias" validValue="50" type="number" min="0" max="100" step="1" value="50" decimals="2" required>
         <p id="upgradeDisplay"></p>
     </template>
     <template id="fitment">
@@ -108,6 +108,7 @@
             ecu = 0;
             brakes = 0;
             weightreduction = 0;
+            brakebias;
 
             constructor(car)
             {
@@ -136,36 +137,42 @@
                         enterTuneData();
                         initializeTemplate();
                     })
-                });
             });
+        });
 
-        function enforceNumericInput(event) {
-            var input = event.target;
-            let value = input.value;
+        function openNumericInput(event){
+            const input = event.target;
+            input.value = "";
+        }
 
-            if (isNaN(value) && value !== "")
-            {
-                console.log('invalid input, resetting to' + input.validValue);
+        function validateNumericInput(event){
+            // Input which triggered the event
+            const input = event.target;
+
+            // Retrieve the decimals to round on
+            var decimals = parseInt(input.getAttribute('decimals'));
+            var coeff = Math.pow(10,decimals);
+
+            // Calculate the rounded value
+            var numValue = Math.round(input.value * coeff) / coeff;
+
+            if (isNaN(numValue)){
+                // If its not a valid number, replace it with the old value.
                 input.value = input.validValue;
             }
-            else
-            {
-                // Remove non-numeric characters (except '-')
-                value = value.replace(/[^\d-]/g, '');
-
-                // Remove leading zeros
-                value = value.replace(/^0+/, '');
-
-                // Parse the value as an integer
-                console.log(value);
-                var intValue = parseInt(value);
-
-                // Ensure it's within the specified range [min, max]
-                intValue = Math.min(Math.max(intValue, parseInt(input.min)), parseInt(input.max))
-
-                // Update the input value
-                input.value = intValue;
-                input.validValue = intValue;
+            else if (numValue < parseFloat(input.min)) {
+                // Numbers smaller than minimum become the minimum.
+                input.value = input.min;
+            }
+            else if (numValue > parseFloat(input.max)) {
+                // Numbers larger than maximum become the maximum.
+                input.value = input.max;
+            }
+            else{
+                // If all goes well, update.
+                input.validValue = input.value;
+                input.value = numValue;
+                updateTuneData(input);
             }
         }
 
@@ -174,8 +181,19 @@
             // Make sure all numeric inputs are fool-proof
             const numericInputs = document.querySelectorAll('.numericInput');
             numericInputs.forEach((input) => {
-                input.addEventListener('input', enforceNumericInput);
+                input.addEventListener('mousedown', openNumericInput);
+                input.addEventListener('blur', validateNumericInput);
             })
+        }
+
+        function updateTuneData(button)
+        {
+            const v = button.value;
+            switch (button.getAttribute('tunefield'))
+            {
+                case "brakebias":
+                    currentTune.brakebias = v; break;
+            }
         }
 
         function enterTuneData()
