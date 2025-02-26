@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sheets Data</title>
+    <title>Car List with Images</title>
     <script>
         const sheetID = '1uThRBT6DRzCn_vGh_2uAs9odGktC_Cg7_DQWgciZ-BY'; // Replace with your sheet ID
 
@@ -24,8 +24,48 @@
                 rows.forEach(row => {
                     if (row.length > 1) { // Ensure the row is not empty
                         let li = document.createElement('li');
-                        li.textContent = `${row[0]} (${row[4]}  ${row[7]}) ${row[8]}`; // Adjust based on your sheet's structure
+                        
+                        // Get the car ID from the first column (row[0])
+                        const carID = row[0];
+
+                        // Remove all spaces from the car ID
+                        const formattedCarID = carID.trim().replace(/\s+/g, '').replace(/\//g, '').replace(/\./g, ''); // Remove all whitespace characters
+
+                        // Construct the image URL based on the car ID inside the "image" folder
+                        let imgPath = `image/${formattedCarID}.png`;
+
+                        // Log the image path for debugging
+                        console.log('Image Path:', imgPath);
+
+                        // Add image if the file exists
+                        let img = document.createElement('img');
+                        img.src = imgPath;
+                        img.alt = `Car ID: ${formattedCarID}`;
+                        
+                        // Style the image to make sure it's visible
+                        img.style.maxWidth = '150px'; // Optional: adjust image size
+                        img.style.height = 'auto';     // Maintain aspect ratio
+                        img.style.display = 'block';   // Ensure it behaves like a block-level element
+                        img.style.border = '2px solid red'; // Add a red border for debugging
+
+                        // Check if image exists by logging it before appending
+                        img.onload = function() {
+                            console.log('Image loaded successfully:', imgPath);
+                        };
+                        img.onerror = function() {
+                            console.error('Error loading image:', imgPath);
+                        };
+
+                        // Append the image first
+                        li.appendChild(img);
+
+                        // Display other data from the sheet
+                        li.appendChild(document.createTextNode(` ${row[0]} (${row[4]}  ${row[7]}) ${row[8]}`)); // Adjust based on your sheet's structure
+                        
+                        // Append the li to carList
                         carList.appendChild(li);
+
+                        console.log('Appended li to carList', li); // Log to verify it's being added
                     }
                 });
             } catch (error) {
@@ -43,7 +83,7 @@
     </script>
 </head>
 <body>
-    <h1>Car List</h1>
+    <h1>Car List with Images</h1>
     <ul id="car-list">Loading...</ul>
 </body>
 </html>
