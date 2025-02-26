@@ -9,7 +9,7 @@
         const apiKey = 'AIzaSyActXBAz1xv4Lw9MIfYH0GertHXhNUsk3k';  // Replace with your API Key
 
         async function loadData() {
-            const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Cars?key=${apiKey}`; // Change "Sheet1" if your sheet has a different name
+            const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Cars?key=${apiKey}`;
 
             try {
                 let response = await fetch(apiURL);
@@ -20,7 +20,7 @@
                     carList.innerHTML = ''; // Clear previous data
                     data.values.forEach(row => {
                         let li = document.createElement('li');
-                        li.textContent = `${row[0]}: ${row[1]} - ${row[2]}`; // Adjust based on your sheet's structure
+                        li.textContent = `${row[0]} (${row[4]}  ${row[7]}) ${row[8]}`; // Adjust based on your sheet's structure
                         carList.appendChild(li);
                     });
                 }
