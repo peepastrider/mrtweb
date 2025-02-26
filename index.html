@@ -3,9 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Database</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
-    <script src="db.js" defer></script>
+    <title>Google Sheets Data</title>
+    <script>
+        const sheetID = '1uThRBT6DRzCn_vGh_2uAs9odGktC_Cg7_DQWgciZ-BY'; // Replace with your Google Sheet ID
+        const apiKey = 'AIzaSyActXBAz1xv4Lw9MIfYH0GertHXhNUsk3k';  // Replace with your API Key
+
+        async function loadData() {
+            const apiURL = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/Cars?key=${apiKey}`; // Change "Sheet1" if your sheet has a different name
+
+            try {
+                let response = await fetch(apiURL);
+                let data = await response.json();
+
+                if (data.values) {
+                    const carList = document.getElementById('car-list');
+                    carList.innerHTML = ''; // Clear previous data
+                    data.values.forEach(row => {
+                        let li = document.createElement('li');
+                        li.textContent = `${row[0]}: ${row[1]} - ${row[2]}`; // Adjust based on your sheet's structure
+                        carList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching data from Google Sheets:', error);
+            }
+        }
+
+        loadData();
+    </script>
 </head>
 <body>
     <h1>Car List</h1>
