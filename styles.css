@@ -1,26 +1,200 @@
+/* Style for Navbar */
+nav {
+  background-color: #333;
+  padding: 10px 0;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+nav ul li {
+  display: inline;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  display: inline-block;
+}
+
+nav ul li a:hover {
+  background-color: #575757;
+  border-radius: 5px;
+}
+
+/* Add spacing so content is not hidden under navbar */
 body {
+  padding-top: 50px;
+}
+
+.car-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+  gap: 20px;
+  padding: 20px;
+}
+
+.car-panel {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.car-panel:hover {
+  transform: scale(1.05);
+}
+
+.car-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+   /* Style for the dropdown toggle button */
+   #tier-button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Style for the checkbox container (hidden by default) */
+#tier-checkboxes {
+    display: none;
+    margin-top: 10px;
+}
+
+/* Style for each checkbox */
+#tier-checkboxes label {
+    display: block;
+    margin: 5px 0;
+}
+
+/* Style for the car-container */
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.car-panel {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.car-image {
+    width: 100%;
+    height: auto;
+}
+
+/* Style for the dropdown button */
+#tier-button {
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-block;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+/* Style for the checkbox container (hidden by default) */
+#tier-checkboxes {
+  display: none;
+  margin-top: 10px;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for each checkbox label */
+#tier-checkboxes label {
+  display: block;
+  margin: 8px 0;
+  font-size: 14px;
   font-family: Arial, sans-serif;
 }
 
-h1 {
+/* Style for the car-container */
+.car-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.car-panel {
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.car-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Style for search bar */
+#search-bar {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  width: 200px;
+  display: inline-block;
+  border: 1px solid #ccc;
+}
+
+#timer-container {
+  height: 50px;
   text-align: center;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+#timer-text {
+  position:absolute;
+  z-index: 2;
+  color:red;
+  text-align: center;
 }
 
-li {
-  margin: 15px 0;
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Space between image and text */
+.progress-container {
+  width: 100%;
+  height: 100%;
+  background-color: lightgray;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  display:flex;
+  text-align:center;
 }
-
-img {
-  max-width: 150px;
-  height: auto;
-  display: block;
-  border: 2px solid red; /* For debugging, remove later */
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: blue;
+  position: absolute;
 }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR:T Hub</title>
+    <link rel="stylesheet" href="../styles.css"> <!-- Link to external CSS -->
+</head>
+<body>
+    <h1>Weekly Challenge</h1>
+    <div id='timer-container'>
+      <div id="timer-text"></div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+    cool bar huh? it would be such a shame if I didn't use it...
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function timer() {
+            let x = Date.now() / 1000;
+
+            let start = 1741478400;
+            let end = 1742083200;
+
+            let percentage = ((x - start) / (end - start)) * 100;
+            percentage = Math.max(0, Math.min(100, percentage));
+
+            let timeLeft = end - x;
+
+            let d = Math.floor(timeLeft / (3600 * 24));
+            let h = Math.floor((timeLeft % (3600 * 24)) / 3600);
+            let m = Math.floor((timeLeft % 3600) / 60);
+            let s = Math.floor(timeLeft % 60);
+
+            let text = "Challenge Ended.";
+            if (timeLeft > 0)
+            {
+              text = `${d}d ${h}h ${m}m ${s}s`
+            } 
+            document.getElementById("timer-text").innerText = text;
+
+            let progressBar = document.getElementById("progress-bar");
+            if (progressBar) {
+                progressBar.style.width = percentage + "%";
+            }
+            else { console.log('bar doesnt exist');}
+
+            setTimeout(timer, 1000);
+        }
+        timer();
+    });
+    </script>
+    <script src="../scripts/navbar.js"></script>
+</body>
+</html>

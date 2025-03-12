@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR:T Hub</title>
+    <link rel="stylesheet" href="../styles.css"> <!-- Link to external CSS -->
+</head>
+<body>
+    <h1>Car Database</h1>
+
+    <!-- Search Bar -->
+    <input type="text" id="search-bar" placeholder="Search cars..." oninput="filterCars()">
+
+    <!-- Button to toggle the visibility of the tier checkboxes -->
+    <button id="tier-button" onclick="toggleTierCheckboxes()">Select Tiers</button>
+
+    <!-- Checkbox container (hidden by default) -->
+    <div id="tier-checkboxes">
+        <label><input type="checkbox" value="1" checked> Tier 1</label>
+        <label><input type="checkbox" value="2" checked> Tier 2</label>
+        <label><input type="checkbox" value="3" checked> Tier 3</label>
+        <label><input type="checkbox" value="4" checked> Tier 4</label>
+    </div>
+
+    <div id="car-container" class="car-grid"></div>
+
+    <script src="../scripts/script.js"></script>
+    <script src="../scripts/navbar.js"></script>
+</body>
+</html>
