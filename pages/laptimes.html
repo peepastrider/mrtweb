@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR:T Hub</title>
+    <link rel="stylesheet" href="../styles.css"> <!-- Link to external CSS -->
+</head>
+<body>
+    <h1>Laptime Database</h1>
+
+    <select id="map-select">
+        <option value="Ichikawa Region">Ichikawa Region</option>
+        <option value="Mt. Otsuki">Mt. Otsuki</option>
+        <option value="Tsukuba">Tsukuba</option>
+        <option value="C1 Expressway">C1 Expressway</option>
+    </select>
+    <select name="course-select" id="course-select"></select>
+
+    <input type="text" id="search-bar" placeholder="Filter by car..." oninput="displayTimes()">
+
+    <div id="laptime-board" class="time-board">
+        <div id="laptime-course"></div>
+        <div id="laptime-header">
+            <div class="header-info">Pos</div>
+            <div class="header-info">Driver</div>
+            <div class="header-info">Best</div>
+            <div class="header-info">S1</div>
+            <div class="header-info">S2</div>
+            <div class="header-info">S3</div>
+        </div>
+        <div id="laptime-entries"></div>
+    </div>
+
+    <script src="../scripts/laptimes.js"></script>
+    <script src="../scripts/navbar.js"></script>
+</body>
+</html>

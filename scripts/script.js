@@ -17,10 +17,38 @@ async function loadData() {
 
         allCars = rows; // Store all rows in the global variable
 
-        displayCars(allCars); // Display all cars initially
+        const params = new URLSearchParams(window.location.search);
+        const carID = params.get("carID"); // Get the tuneID query parameter
+        if (carID)
+        {
+            displayCar(carID);
+        }
+        else 
+        {
+            displayCars(allCars); 
+        }
     } catch (error) {
         console.error("Error fetching data:", error);
     }
+}
+
+function displayCar(carID) {
+    const carContainer = document.getElementById('car-container');
+    const row = allCars.filter(car => car[0].replace(/ /g, '_') == carID)[0];
+    carContainer.innerHTML = `
+        <button onclick="displayCars(allCars)">Back</button>
+        <h2>${row[4]} ${row[7]}</h2>
+        <img src="../image/car/${row[0].replace(/\s+/g, '').replace(/\./g, '').replace(/\//g, '')}.png" 
+             onerror="this.onerror=null; this.src='../image/car/default.png';">
+        <p>${nD(row[8])}</p>
+        <p>Tier ${nD(row[9])}</p>
+        <p>Weight: ${nD(row[12])}</p> 
+        <p>Power: ${nD(row[14])}</p>
+        <p>Drivetrain: ${nD(row[10])}</p>
+        <p>Gearbox: ${nD(row[11])}-speed</p>
+        <p>Assists: ${assistHelper(row[16],row[17])}</p>
+        <p>In-game top speed: ${nD(row[18])}</p>
+    `;
 }
 
 // Function to display the cars based on the filtered data
@@ -28,27 +56,90 @@ function displayCars(rows) {
     const carContainer = document.getElementById('car-container');
     carContainer.innerHTML = ''; // Clear any existing cars
 
+    // remove params if there is any
+    history.replaceState({}, "", window.location.pathname);
+
     rows.forEach(row => {
         let carPanel = document.createElement('div');
         carPanel.classList.add('car-panel');
 
-        // Assuming row[0] is Car ID, row[1] is Model, row[2] is Year, etc.
         let carID = row[0].replace(/\s+/g, '').replace(/\./g, '').replace(/\//g, ''); // Remove whitespace for image lookup
-        let imagePath = `../image/${carID}.png`;
+        let imagePath = `../image/car/${carID}.png`;
 
         carPanel.innerHTML = `
-            <img src="${imagePath}" alt="${row[1]}" class="car-image" onerror="this.onerror=null; this.src='../image/default.png';">
-            <h3>${row[4]} ${row[1]} ${row[2]}</h3>
-            <p>(${row[4]} ${row[7]})</p>
+            <img src="${imagePath}" alt="${row[1]}" class="car-image" onerror="this.onerror=null; this.src='../image/car/default.png';">
+            <h3>${row[4]} ${row[7]}</h3>
+            <p>(${row[0]})</p>
             <p>${row[8]}</p>
             <p>Tier ${row[9]}</p>
-            <p>${row[12]}; ${row[13]}</p>
+            <p>${row[12]}; ${row[14]}</p>
         `;
+
+        carPanel.addEventListener('click', () => {
+            let url = new URL(window.location.href);
+            let carID = row[0].replace(/ /g, '_')
+            url.searchParams.set("carID", carID); // Set new query parameter
+            history.pushState({}, "", url); // Update URL without reloading
+            displayCar(carID);
+        });
 
         carContainer.appendChild(carPanel);
     });
 }
 
+function openModal(row) {
+    const modal = document.getElementById('car-modal');
+    const modalContent = document.getElementById('modal-content');
+
+    modalContent.innerHTML = `
+        <h2>${row[4]} ${row[7]}</h2>
+        <img src="../image/car/${row[0].replace(/\s+/g, '').replace(/\./g, '').replace(/\//g, '')}.png" 
+             onerror="this.onerror=null; this.src='../image/car/default.png';">
+        <p>${nD(row[8])}</p>
+        <p>Tier ${nD(row[9])}</p>
+        <p>Weight: ${nD(row[12])}</p> 
+        <p>Power: ${nD(row[14])}</p>
+        <p>Drivetrain: ${nD(row[10])}</p>
+        <p>Gearbox: ${nD(row[11])}-speed</p>
+        <p>Assists: ${assistHelper(row[16],row[17])}</p>
+        <p>In-game top speed: ${nD(row[18])}</p>
+        <button onclick="closeModal()">Close</button>
+    `;
+    modal.style.display = "block";
+}
+
+function assistHelper(tcs, abs) {
+    tcs = tcs.toLowerCase() === "true";
+    abs = abs.toLowerCase() === "true";
+    if (abs && tcs)
+    {
+        return 'ABS, TCS';
+    }
+    if (abs && !tcs)
+    {
+        return 'ABS';
+    }
+    if (!abs && tcs)
+    {
+        return 'TCS';
+    }
+    else
+    {
+        return '-';
+    }
+}
+
+function nD(row) {
+    if (!row)
+    {
+        return "No data.";
+    }
+    return row;
+}
+
+function closeModal() {
+    document.getElementById('car-modal').style.display = "none";
+}
 // Convert CSV to an array of rows and columns
 function csvToArray(csv) {
     return csv.split("\n").slice(1).map(row => 
