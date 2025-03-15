@@ -317,3 +317,50 @@ body {
 #tune-options {
   background: gray;
 }
+
+/* tuner */
+#tune-input {
+  background: gray;
+  margin: 1%;
+}
+#stages-container {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+#stages-container div {
+  background: #333;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  cursor: pointer;
+}
+
+#stages-container .selected-stage {
+  background: #666;
+  border: 2px solid white;
+}
+
+#stage-description {
+  font-size: 14px;
+  color: lightgray;
+  margin: 10px 0;
+}
+
+#stage-select {
+  background: #555;
+  padding: 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#stage-select.selected {
+  background: gray;
+}
