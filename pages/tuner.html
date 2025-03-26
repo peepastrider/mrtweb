@@ -10,6 +10,8 @@
     <h1>Tuner</h1>
 
     <div id="tuner-container">
+        <input type="text" id="search-bar" placeholder="enter car" oninput="selectCar(this.value)">
+        <div id="tuner-car">Selected Car:</div>
         <div id="tune-options">
             <img src="../image/tuning/overview.png" onclick="loadCategory('overview')"></img>
             <img src="../image/tuning/ecu.png" onclick="loadCategory('ecu')"></img>
