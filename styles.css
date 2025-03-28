@@ -13,7 +13,6 @@ nav ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
   justify-content: center;
   gap: 20px;
 }
@@ -34,6 +33,13 @@ nav ul li a:hover {
   border-radius: 5px;
 }
 
+.nav-header {
+  color: #BBBBBB;
+  display: inline-block;
+  width: 40%;
+  text-align: right;
+}
+
 .separator {
   flex-grow: 1; 
   margin: 0 20px; 
@@ -41,7 +47,7 @@ nav ul li a:hover {
 
 /* Add spacing so content is not hidden under navbar */
 body {
-  padding-top: 50px;
+  padding-top: 150px;
 }
 
 .car-grid {
@@ -323,13 +329,13 @@ body {
   background: gray;
   margin: 1%;
 }
-#stages-container {
+.stages-container {
   display: flex;
   gap: 8px;
   margin: 10px 0;
 }
 
-#stages-container div {
+.stages-container div {
   background: #333;
   padding: 10px 15px;
   border-radius: 6px;
@@ -339,18 +345,26 @@ body {
   cursor: pointer;
 }
 
-#stages-container .selected-stage {
+.induction-select {
+  color:#333;
+}
+
+.selected-induction {
+  color:white;
+}
+
+.selected-stage {
   background: #666;
   border: 2px solid white;
 }
 
-#stage-description {
+.stage-description {
   font-size: 14px;
   color: lightgray;
   margin: 10px 0;
 }
 
-#stage-select {
+.stage-select {
   background: #555;
   padding: 12px;
   text-align: center;
@@ -361,6 +375,6 @@ body {
   margin-top: 10px;
 }
 
-#stage-select.selected {
+.stage-select.selected {
   background: gray;
 }

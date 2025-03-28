@@ -37,6 +37,7 @@ function displayCar(carID) {
     const row = allCars.filter(car => car[0].replace(/ /g, '_') == carID)[0];
     carContainer.innerHTML = `
         <button onclick="displayCars(allCars)">Back</button>
+        <button onclick="gotoTuner()">View in Tuner</button>
         <h2>${row[4]} ${row[7]}</h2>
         <img src="../image/car/${row[0].replace(/\s+/g, '').replace(/\./g, '').replace(/\//g, '')}.png" 
              onerror="this.onerror=null; this.src='../image/car/default.png';">
@@ -49,6 +50,12 @@ function displayCar(carID) {
         <p>Assists: ${assistHelper(row[16],row[17])}</p>
         <p>In-game top speed: ${nD(row[18])}</p>
     `;
+}
+
+function gotoTuner() {
+    const params = new URLSearchParams(window.location.search);
+    const carID = params.get("carID");
+    window.location.href = `tuner.html?carID=${carID}`;
 }
 
 // Function to display the cars based on the filtered data
