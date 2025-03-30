@@ -1,19 +1,19 @@
 <div>
   <div>Brake Force</div>
-  <div class="stages-container">
-    <div onclick="selectGeneral(this.innerHTML,'brakes',0)" class="selected-stage">0</div>
-    <div onclick="selectGeneral(1,'brakes',0)">1</div>
-    <div onclick="selectGeneral(2,'brakes',0)">2</div>
-    <div onclick="selectGeneral(3,'brakes',0)">3</div>
+  <div id="brakes" class="stages-container">
+    <div class="selected-stage">0</div>
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
   </div>
   <div class="stage-description" data-values="[100,133,149,166]">placeholder text</div>
   <div class="stage-calc">weight +100</div>
-  <div>Brake Bias</div>
-  <div>
-    <button class="button" onclick="incrementInput('brakebias', -5)">-5</button>
-    <button class="button" onclick="incrementInput('brakebias', -1)">-1</button>
-    <input type="number" max=100 min=0 class="input-value" id="brakeBias" onblur="editInput('brakebias')">
-    <button class="button" onclick="incrementInput('brakebias', 1)">+1</button>
-    <button class="button" onclick="incrementInput('brakebias', 5)">+5</button>
+  <div>Brake Bias (%)</div>
+  <div class="brakebias">
+    <button class="button">-5</button>
+    <button class="button">-1</button>
+    <input type="number" max=100 min=0 class="input-value" id="brakebias">
+    <button class="button">+1</button>
+    <button class="button">+5</button>
   </div>
 </div>
