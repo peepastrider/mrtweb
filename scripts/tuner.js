@@ -1,4 +1,5 @@
 import { loadData } from './common/loadData.js';
+import { compressTune, decompressTune, tuneToBinary } from './common/compression.js';
 
 let cars = [];
 let selectedCar = [];
@@ -19,16 +20,36 @@ const subtuning = {
   'offset':['foffset','roffset'],
   'coils':['fdamp','fstiff','rdamp','rstiff'],
   'stance':['fheight','fcamber','rheight','rcamber'],
-  'steering':['aggressiveness', 'ratio']
+  'steering':['aggressiveness', 'ratio'],
+  'gears':['finaldrive']
 };
+
+// wip
+
+function saveTune() {
+  let code = compressTune(tune);
+  console.log(code);
+  alert(code);
+
+  console.log(tuneToBinary(tune));
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
   cars = await loadData();
   const params = new URLSearchParams(window.location.search);
   const carID = params.get("carID");
+  const tuneCode = params.get("tuneCode");
   if (carID)
     selectCar(carID.replace(/_/g, ' '));
   loadCategoryButtons();
+
+  if(tuneCode)
+    tune = decompressTune(tuneCode);
+
+  document.getElementById('search-bar').addEventListener('input', function() {
+    selectCar(this.value);
+  });
+  document.getElementById('save-tune-button').addEventListener('click', () => saveTune());
 });
 
 function loadCategoryButtons() {
@@ -53,14 +74,16 @@ async function loadCategory(category) {
 }
 
 function loadTuneCategory(category) {
+  if (category == 'forcedinduction') {
+    loadInduction();
+    return;
+  }
   // Stage buttons
   const upgrades = subcategories[category];
   if (upgrades) {
     upgrades.forEach(upgrade => {
-      const container = document.getElementById(upgrade);
-      const stages = Array.from(container.children);
-      stages.forEach(stage => {
-        stage.addEventListener('click', () => selectGeneral(stage.innerHTML,upgrade,0));
+      document.querySelectorAll(`#${upgrade} *`).forEach(stage => {
+        stage.addEventListener('click', () => selectGeneral(stage.innerHTML,upgrade));
       });
     });
   }
@@ -68,17 +91,26 @@ function loadTuneCategory(category) {
   const inputs = subtuning[category];
   if (inputs) {
     inputs.forEach(input => {
-      const container = document.getElementsByClassName(input)[0];
-      const children = Array.from(container.children);
-      children.forEach(child => {
-        if (child.classList.contains('button'))
-          child.addEventListener('click', () => incrementInput(input, Number(child.innerHTML)));
-        else 
-          child.addEventListener('blur', () => editInput(container));
+      document.querySelectorAll(`.${input} .button`).forEach(button => {
+        button.addEventListener('click', () => incrementInput(input, Number(button.innerHTML)));
+      });
+      document.querySelectorAll(`.${input} .input-value`).forEach(input => {
+        input.addEventListener('blur', () => editInput(input.getAttribute('id')));
       });
     });
   }
-  console.log(`Loaded category ${category}`);
+}
+
+function loadInduction() {
+  document.querySelectorAll('.stages-container').forEach(container => {
+    let category = container.getAttribute('id');
+    Array.from(container.children).forEach(child => {
+      if(child.classList.contains('induction-select'))
+        child.addEventListener('click', () => selectInduction(category));
+      else
+        child.addEventListener('click', () => selectInductionStage(child.innerHTML, category));
+    });
+  });
 }
 
 // -------------------------------
@@ -96,8 +128,7 @@ function selectCar(carID) {
       url.searchParams.set("carID", carID); // Set new query parameter
       history.pushState({}, "", url); // Update URL without reloading
 
-      let tunerCar = document.getElementById('tuner-car');
-      tunerCar.innerHTML = `Selected Car: ${selectedCar.carID}`;
+      document.getElementById('tuner-car').innerHTML = `Selected Car: ${selectedCar.carID}`;
     }
   });
 }
@@ -105,22 +136,34 @@ function selectCar(carID) {
 function createGears() {
   const maxVal = 6.5;
   const minVal = 0.5;
+  const stockGears = [2.7, 2.1, 1.85, 1.35, 1.02];
+  const stockFD = 2.92;
+  document.getElementById('finaldrive').setAttribute('value', stockFD);
   const container = document.getElementById('gears-container');
   for (let i = 1; i <= selectedCar.gears; i++) {
     let html = `
     <div>
       <div>Gear ${i}</div>
       <div class="gear${i}">
-        <button class="button" onclick="incrementInput(this.parentElement.getAttribute('class'), Number(this.innerHTML))">-1</button>
-        <button class="button" onclick="incrementInput(this.parentElement.getAttribute('class'), Number(this.innerHTML))">-0.02</button>
-        <input type="number" max=${maxVal} min=${minVal} class="input-value" id="gear${i}" onblur="editInput(this.parentElement)">
-        <button class="button" onclick="incrementInput(this.parentElement.getAttribute('class'), Number(this.innerHTML))">+0.02</button>
-        <button class="button" onclick="incrementInput(this.parentElement.getAttribute('class'), Number(this.innerHTML))">+1</button>
+        <button class="button">-1</button>
+        <button class="button">-0.02</button>
+        <input type="number" max=${maxVal} min=${minVal} value=${stockGears[i-1]} class="input-value" id="gear${i}" onblur="editInput(this.parentElement)">
+        <button class="button">+0.02</button>
+        <button class="button">+1</button>
       </div>
     </div>
               `;
+    tune[`gear${i}`] = stockGears[i-1];
     container.innerHTML += html;
   }
+  // Make the buttons function
+  document.querySelectorAll('.button').forEach(button => {
+    button.addEventListener('click', () => incrementInput(button.parentElement.getAttribute('class'), Number(button.innerHTML)));
+  });
+  document.querySelectorAll('.input-value').forEach(input => {
+    input.addEventListener('blur', () => editInput(input.parentElement.getAttribute('class')));
+  });
+  //
   gearsGraph();
 }
 
@@ -142,6 +185,7 @@ function initializeValues(category) {
       ${selectedCar.carID} ///
       HP: ${selectedCar.peakHP} -> ${calculateHP()}
       `;
+      console.log(tune);
       break;
     case 'forcedinduction':
       selectInduction(tune['forcedinduction']);
@@ -158,6 +202,7 @@ function initializeValues(category) {
       selectGeneralDefault(category);
       break;
     case 'gears':
+      selectGeneralDefault(category);
       createGears();
       break;
     default:
@@ -168,16 +213,12 @@ function initializeValues(category) {
 function selectGeneralDefault(category) {
   const subcats = subcategories[category];
   if (subcats)
-  {
-    let i = 0;
     subcats.forEach(subcat => {
-      selectGeneral(tune[subcat] ? tune[subcat] : 0, subcat, i);
-      i = i+1;
+      selectGeneral(tune[subcat] ? tune[subcat] : 0, subcat);
     });
-  }
-  const subtune = subtuning[category];
-  if (subtune)
-    subtune.forEach(subtune => {
+  const subtunes = subtuning[category];
+  if (subtunes)
+    subtunes.forEach(subtune => {
       incrementInput(subtune, 0);
     });
 }
@@ -187,24 +228,21 @@ function selectInduction(category) {
   const x = subcategories['forcedinduction'];
 
   // Set old categories value to 0
-  let i = 0;
   x.forEach(subcat => {
     if (subcat != category)
-      selectGeneral(0, subcat, i)
-    i = i + 1;
+      selectGeneral(0, subcat)
   });
 
   // Update visual
-  const conts = document.getElementsByClassName('induction-select');
-  Array.from(conts).forEach(cont => {
+  document.querySelectorAll('.stages-container').forEach(cont => {
     if (cont.getAttribute('id') == category)
-      cont.classList.add('selected-induction');
+      cont.children[0].classList.add('selected-induction');
     else
-      cont.classList.remove('selected-induction');
+      cont.children[0].classList.remove('selected-induction');
   });
 }
 
-function selectInductionStage(n, category, i) {
+function selectInductionStage(n, category) {
   if (tune['forcedinduction'] == category)
     selectGeneral(n, category);
 }
@@ -212,7 +250,6 @@ function selectInductionStage(n, category, i) {
 function selectGeneral(n, category) {
   stageSelect(n,category);
   tune[category] = n;
-  //console.log(tune);
   switch(category) {
     case 'internals':
     case 'block':
@@ -239,29 +276,18 @@ function clamp(x, min, max) {
 }
 
 function incrementInput(category, x) {
-  const inputs = document.getElementsByClassName('input-value');
-  let input = {};
-  Array.from(inputs).forEach(inp => {
-    if (inp.parentElement.classList.contains(category))
-      input = inp;
-  });
-  const maxVal = input.max;
-  const minVal = input.min;
+  let input = document.querySelector(`.${category} .input-value`);
   if(!tune[category])
     tune[category] = 0; 
+  const maxVal = input.max;
+  const minVal = input.min;
   let newVal = clamp(tune[category] + x, minVal, maxVal);
   input.value = newVal;
   tune[category] = newVal;
 }
 
-function editInput(container) {
-  const inputs = document.getElementsByClassName('input-value');
-  let input = {};
-  Array.from(inputs).forEach(inp => {
-    if (inp.parentElement == container)
-      input = inp;
-  });
-  let category = container.getAttribute('class');
+function editInput(category) {
+  let input = document.querySelector(`.${category} .input-value`);
   if(!tune[category])
     tune[category] = 0; 
   const maxVal = input.max;
@@ -298,15 +324,11 @@ function updateWeightDescription(n, category) {
 }
 
 function stageSelect(stage, category) {
-  const cont = document.getElementById(category);
-  Array.from(cont.children).forEach(child => {
-    if (!child.classList.contains('induction-select'))
-    {
-      if (child.innerHTML == stage)
-        child.classList.add('selected-stage');
-      else 
-        child.classList.remove('selected-stage');
-    }
+  document.querySelectorAll(`#${category} div`).forEach(child => {
+    if (child.innerHTML == stage)
+      child.classList.add('selected-stage');
+    else 
+      child.classList.remove('selected-stage');
   });
 }
 
