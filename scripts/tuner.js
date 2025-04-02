@@ -1,5 +1,5 @@
 import { loadData } from './common/loadData.js';
-import { compressTune, decompressTune, tuneToBinary } from './common/compression.js';
+import { compressTune, decompressTune } from './common/compression.js';
 
 let cars = [];
 let selectedCar = [];
@@ -30,8 +30,6 @@ function saveTune() {
   let code = compressTune(tune);
   console.log(code);
   alert(code);
-
-  console.log(tuneToBinary(tune));
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
