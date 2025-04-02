@@ -1,4 +1,4 @@
-import { loadData } from './common/loadData.js';
+import { loadCars } from './common/loadData.js';
 import { compressTune, decompressTune } from './common/compression.js';
 
 let cars = [];
@@ -28,12 +28,15 @@ const subtuning = {
 
 function saveTune() {
   let code = compressTune(tune);
+  let url = new URL(window.location.href);
+  url.searchParams.set("tuneCode", code); // Set new query parameter
+  history.pushState({}, "", url); // Update URL without reloading
+  alert('URL has been updated with the tune code.');
   console.log(code);
-  alert(code);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  cars = await loadData();
+  cars = await loadCars();
   const params = new URLSearchParams(window.location.search);
   const carID = params.get("carID");
   const tuneCode = params.get("tuneCode");
@@ -64,11 +67,22 @@ async function loadCategory(category) {
       let categoryHTML = await response.text();
       const tuneInput = document.getElementById('tune-input');
       tuneInput.innerHTML = categoryHTML;
+      selectCategoryVisual(category);
       loadTuneCategory(category);
       initializeValues(category);
-  } catch (error) {
+  } 
+  catch (error) {
       console.error("Error loading tuning category:", error);
   }
+}
+
+function selectCategoryVisual(category) {
+  document.querySelectorAll('#tune-options img').forEach(img => {
+    if (img.src.split('/').pop().split('.')[0] == category)
+      img.classList.add('selected-category'); 
+    else
+      img.classList.remove('selected-category');
+  });
 }
 
 function loadTuneCategory(category) {
@@ -134,8 +148,13 @@ function selectCar(carID) {
 function createGears() {
   const maxVal = 6.5;
   const minVal = 0.5;
-  const stockGears = [2.7, 2.1, 1.85, 1.35, 1.02];
   const stockFD = 2.92;
+
+  let stockGears = [2.7, 2.1, 1.85, 1.35, 1.02, 0, 0, 0, 0, 0];
+  if (tune['gear1'])
+    for (let i = 1; i <= selectedCar.gears; i++)
+      stockGears[i-1] = tune[`gear${i}`];
+
   document.getElementById('finaldrive').setAttribute('value', stockFD);
   const container = document.getElementById('gears-container');
   for (let i = 1; i <= selectedCar.gears; i++) {
@@ -204,6 +223,7 @@ function initializeValues(category) {
       createGears();
       break;
     default:
+      console.error(`invalid tuning category selected: ${category}`);
       break;
   }
 }

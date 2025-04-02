@@ -324,6 +324,18 @@ body {
   background: gray;
 }
 
+#tune-options img {
+  border-radius: 15px;
+}
+
+#tune-options img:hover {
+  background:rgb(128, 64, 64);
+}
+
+#tune-options .selected-category {
+  background: maroon;
+}
+
 /* tuner */
 #tune-input {
   background: gray;

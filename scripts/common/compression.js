@@ -13,21 +13,31 @@ const schema = [
   ['supercharger', 'uint2', 1],
   ['sequential', 'uint2', 1],
   // tuning
-  ['brakebias', 'uint8', 10],
-  ['aggressiveness', 'uint8', 1],
-  ['ratio', 'uint8', 10],
-  ['fdamp', 'uint16', 1],
-  ['fstiff', 'uint16', 1],
-  ['rdamp', 'uint16', 1],
-  ['rstiff', 'uint16', 1],
-  ['finaldrive', 'int16', 100],
-  /// dunno what to do with gears
-  ['fheight', 'int16', 100],
-  ['fcamber', 'int16', 10],
-  ['rheight', 'int16', 100],
-  ['rcamber', 'int16', 10],
-  ['foffset', 'int16', 100],
-  ['roffset', 'int16', 100],
+  ['brakebias', 'uint10', 10], // [0.0, 100.0]
+  ['aggressiveness', 'uint9', 1], // [10, 250]
+  ['ratio', 'uint9', 10], // [14.0, 30.0]
+  ['fdamp', 'uint9', 1], // [50, 500]
+  ['rdamp', 'uint9', 1],
+  ['fstiff', 'uint14', 1], // [1000, 15000]
+  ['rstiff', 'uint14', 1],
+  ['fheight', 'int8', 100], // [-0.50, 0.50]
+  ['rheight', 'int8', 100],
+  ['fcamber', 'int9', 10], // [-20.0, 0.0]
+  ['rcamber', 'int9', 10], 
+  ['foffset', 'int8', 100], // [-0.50, 0.50]
+  ['roffset', 'int8', 100],
+  // stupid gears
+  ['finaldrive', 'uint10', 100], // [0.10, 6.50]
+  ['gear1', 'uint10', 100],
+  ['gear2', 'uint10', 100],
+  ['gear3', 'uint10', 100],
+  ['gear4', 'uint10', 100],
+  ['gear5', 'uint10', 100],
+  ['gear6', 'uint10', 100],
+  ['gear7', 'uint10', 100],
+  ['gear8', 'uint10', 100],
+  ['gear9', 'uint10', 100],
+  ['gear10', 'uint10', 100],
 ];
 
 const forcedinduction = ['stock', 'turbo', 'sequential', 'supercharger'];
@@ -35,7 +45,7 @@ const forcedinduction = ['stock', 'turbo', 'sequential', 'supercharger'];
 // Base 64 alphabet
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
-const bsLength = 224;
+const bsLength = 258;
 
 function debug() {
   let n = 0;
@@ -56,7 +66,7 @@ function debug2(tune) {
   if (bitstring == bitstring2)
     console.log(`Bitstrings match`);
   else
-    for (let i = 0; i < 223; i++)
+    for (let i = 0; i < bsLength; i++)
       if (bitstring[i] != bitstring2[i])
         console.log(`Incorrect: bit ${i}`);
   let tune2 = binaryToTune(bitstring2);
@@ -87,6 +97,7 @@ function getLength2(format) {
 // --------------
 
 export function compressTune(tune) {
+  debug();
   return binaryToCode(tuneToBinary(tune));
 }
 
@@ -117,11 +128,11 @@ function tuneToBinary(tune) {
 }
 
 function binaryToCode(bitstring) {
-  if (bitstring.length !== 224)
-    throw new Error("Tunecode must be a 224-bit string. Please contact developer if you see this.");
+  if (bitstring.length !== bsLength)
+    throw new Error(`Tunecode must be a ${bsLength}-bit string. Please contact developer if you see this.`);
   let result = '';
   let chunkSize = 6;
-  for (let i = 0; i < 223; i += chunkSize) {
+  for (let i = 0; i < bsLength; i += chunkSize) {
     const bits = bitstring.slice(i, i+chunkSize);
     const chunkValue = parseInt(bits, 2);
     result += alphabet[chunkValue];
@@ -167,7 +178,7 @@ function binaryToTune(bitstring) {
     const bits = bitstring.slice(index, max);
     if (key == 'forcedinduction')
       result[key] = forcedinduction[parseInt(bits, 2)/offset];
-    else if (format == 'int16')
+    else if (format[0] !== 'u')
       result[key] = parseSignedBinary(n,bits)/offset;
     else
       result[key] = parseInt(bits, 2)/offset;
@@ -179,7 +190,7 @@ function binaryToTune(bitstring) {
 
 function codeToBinary(tuneCode) {
   let result = ''
-  for (let i = 0; i < 37; i++) {
+  for (let i = 0; i < (bsLength/6); i++) {
     const val = tuneCode[i];
     let chunkValue = alphabet.indexOf(val);
     if (chunkValue === -1)
@@ -187,7 +198,7 @@ function codeToBinary(tuneCode) {
     //console.log(`${val} in binary: ${chunkValue.toString(2).padStart(6, "0")}`);
     result += chunkValue.toString(2).padStart(6, "0");
   }
-  return result + "00";
+  return result;
 }
 
 // this function sucks

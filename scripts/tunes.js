@@ -20,14 +20,11 @@ async function loadData() {
         const params = new URLSearchParams(window.location.search);
         const tuneID = params.get("tuneID"); // Get the tuneID query parameter
         if (tuneID)
-        {
             displayTune(tuneID);
-        }
         else 
-        {
             displayTunes(tunes); 
-        }
-    } catch (error) {
+    } 
+    catch (error) {
         console.error("Error fetching data:", error);
     }
 }

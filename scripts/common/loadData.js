@@ -1,15 +1,18 @@
-export async function loadData() {
+export async function loadCars() {
   const sheetID = '1uThRBT6DRzCn_vGh_2uAs9odGktC_Cg7_DQWgciZ-BY'; 
-  const apiURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv`;
+  return loadFromSpreadsheet(sheetID, formatCars);
+}
 
+async function loadFromSpreadsheet(sheetID, formatter) {
+  const apiURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv`;
   try {
-      let response = await fetch(apiURL);
-      let data = await response.text();
-      const rows = csvToArray(data);
-      return formatResponse(rows);
-  } catch (error) {
-      console.error("Error fetching data:", error);
-  }
+    let response = await fetch(apiURL);
+    let data = await response.text();
+    const rows = csvToArray(data);
+    return formatter(rows);
+} catch (error) {
+    console.error("Error fetching data:", error);
+}
 }
 
 function csvToArray(csv) {
@@ -18,7 +21,7 @@ function csvToArray(csv) {
   );
 }
 
-function formatResponse(rows) {
+function formatCars(rows) {
   let i = 0;
   let result = [];
   rows.forEach(row => {
