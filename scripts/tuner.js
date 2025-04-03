@@ -148,14 +148,16 @@ function selectCar(carID) {
 function createGears() {
   const maxVal = 6.5;
   const minVal = 0.5;
-  const stockFD = 2.92;
 
-  let stockGears = [2.7, 2.1, 1.85, 1.35, 1.02, 0, 0, 0, 0, 0];
+  let stockFD = selectedCar.stockFD ? selectedCar.stockFD : 2.92; 
+  let stockGears = selectedCar.stockRatios ? selectedCar.stockRatios : [2.7, 2.1, 1.85, 1.35, 1.02, 0, 0, 0, 0, 0];
+
   if (tune['gear1'])
     for (let i = 1; i <= selectedCar.gears; i++)
       stockGears[i-1] = tune[`gear${i}`];
 
-  document.getElementById('finaldrive').setAttribute('value', stockFD);
+  tune['finaldrive'] = stockFD;
+  
   const container = document.getElementById('gears-container');
   for (let i = 1; i <= selectedCar.gears; i++) {
     let html = `
@@ -174,12 +176,13 @@ function createGears() {
     container.innerHTML += html;
   }
   // Make the buttons function
-  document.querySelectorAll('.button').forEach(button => {
+  document.querySelectorAll('#gears-container div .button').forEach(button => {
     button.addEventListener('click', () => incrementInput(button.parentElement.getAttribute('class'), Number(button.innerHTML)));
   });
-  document.querySelectorAll('.input-value').forEach(input => {
+  document.querySelectorAll('#gears-container div   .input-value').forEach(input => {
     input.addEventListener('blur', () => editInput(input.parentElement.getAttribute('class')));
   });
+  
   //
   gearsGraph();
 }
@@ -203,6 +206,7 @@ function initializeValues(category) {
       HP: ${selectedCar.peakHP} -> ${calculateHP()}
       `;
       console.log(tune);
+      console.log(selectedCar);
       break;
     case 'forcedinduction':
       selectInduction(tune['forcedinduction']);
@@ -219,8 +223,8 @@ function initializeValues(category) {
       selectGeneralDefault(category);
       break;
     case 'gears':
-      selectGeneralDefault(category);
       createGears();
+      selectGeneralDefault(category);
       break;
     default:
       console.error(`invalid tuning category selected: ${category}`);

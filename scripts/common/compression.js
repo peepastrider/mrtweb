@@ -97,7 +97,6 @@ function getLength2(format) {
 // --------------
 
 export function compressTune(tune) {
-  debug();
   return binaryToCode(tuneToBinary(tune));
 }
 
@@ -109,7 +108,6 @@ export function decompressTune(tuneCode) {
 
 function tuneToBinary(tune) {
   let result = '';
-  console.log(tune);
   for (const [key,format,offset] of schema) {
     if (key == 'forcedinduction') {
       result += toBitString(forcedinduction.indexOf(tune[key]),2);
@@ -122,7 +120,6 @@ function tuneToBinary(tune) {
       result += toBitString(value, n);
     }
   }
-  console.log(result + " " + result.length);
   return result;
   // result.length = 224
 }

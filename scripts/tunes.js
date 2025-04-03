@@ -1,39 +1,26 @@
+import { loadTunes } from './common/loadData.js';
+import { decompressTune } from './common/compression.js';
+
 let tunes = [];
 
-// This function loads the tune data from the Google Sheets API
+// Initialize the page when loaded
+window.addEventListener("load", () => {
+  loadData();
+});
+
 async function loadData() {
-    const sheetID = '1Eco30_8EtgNr4YuUzkCGX26-NoP5AR4-pkHRKKByLJE'; 
-    const apiURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv`;
+  tunes = await loadTunes();
+  const tuneContainer = document.getElementById('tune-container');
+  if (!tuneContainer) return;
 
-    try {
-        let response = await fetch(apiURL);
-        let data = await response.text();
+  tuneContainer.innerHTML = ''; // Clear existing content
 
-        const rows = csvToArray(data);
-        const tuneContainer = document.getElementById('tune-container');
-        if (!tuneContainer) return;
-
-        tuneContainer.innerHTML = ''; // Clear existing content
-
-        tunes = rows; // Store all rows in the global variable
-
-        const params = new URLSearchParams(window.location.search);
-        const tuneID = params.get("tuneID"); // Get the tuneID query parameter
-        if (tuneID)
-            displayTune(tuneID);
-        else 
-            displayTunes(tunes); 
-    } 
-    catch (error) {
-        console.error("Error fetching data:", error);
-    }
-}
-
-// Convert CSV to an array of rows and columns
-function csvToArray(csv) {
-  return csv.split("\n").slice(1).map(row => 
-      row.split(",").map(cell => cell.replace(/^"|"$/g, '').trim())  // Remove surrounding quotes and trim
-  );
+  const params = new URLSearchParams(window.location.search);
+  const tuneID = params.get("tuneID"); // Get the tuneID query parameter
+  if (tuneID)
+      displayTune(tuneID);
+  else 
+      displayTunes(tunes); 
 }
 
 function displayTunes(tunes) {
@@ -43,22 +30,20 @@ function displayTunes(tunes) {
   // remove params if there is any
   history.replaceState({}, "", window.location.pathname);
 
-  tunes.forEach(row => {
+  tunes.forEach(tune => {
     let panel = document.createElement('div');
     panel.classList.add('car-panel');
     panel.innerHTML = `
-    <h2>${row[3]}</h2>
-    <p>${row[1]}</p>
-    <p>Category: ${row[4]}</p>
-    <p>Author: ${row[2]}</p>
+    <h2>${tune.name}</h2>
+    <p>${tune.carID}</p>
+    <p>Category: ${tune.category}</p>
+    <p>Author: ${tune.author}</p>
     `;
-
     panel.addEventListener('click', () => {
       let url = new URL(window.location.href);
-      let tuneID = row[0].replace(/ /g, '_')
-      url.searchParams.set("tuneID", tuneID); // Set new query parameter
+      url.searchParams.set("tuneID", tune.tuneID); // Set new query parameter
       history.pushState({}, "", url); // Update URL without reloading
-      displayTune(tuneID);
+      displayTune(tune.tuneID);
     });
 
     tuneContainer.appendChild(panel);
@@ -67,62 +52,65 @@ function displayTunes(tunes) {
 
 function displayTune(tuneID) {
   const tuneContainer = document.getElementById('tune-container');
-  const row = tunes.filter(tune => tune[0] == tuneID)[0];
-  console.log(row);
+  const tuneDesc = tunes.filter(tune => tune.tuneID == tuneID)[0];
+  const tune = decompressTune(tuneDesc.tuneCode);
+
   tuneContainer.innerHTML = `
-    <button onclick="displayTunes(tunes)">Back</button>
-    <h2>${row[3]}</h2>
-    <p>Car: ${row[1]}</p>
-    <p>Category: ${row[4]}</p>
-    <p>Author: ${row[2]}</p>
+    <button class="backbutton">Back</button>
+    <button class="tuner-viewer">View in Tuner</button>
+    <h2>${tuneDesc.name}</h2>
+    <p>Car: ${tuneDesc.carID}</p>
+    <p>Category: ${tuneDesc.category}</p>
+    <p>Author: ${tuneDesc.author}</p>
     <br>
-    <p>"${row[5]}"</p>
+    <p>"${tuneDesc.description}"</p>
     <br>
     <div class="tune-container">
       <div class="tune-column">
         <h3>Upgrades</h3>
-        <p>Brakes: ${row[6]}</p>
-        <p>Weight Reduction: ${row[7]}</p>
-        <p>Injectors: ${row[8]}</p>
-        <p>ECU: ${row[9]}</p>
-        <p>Intake: ${row[10]}</p>
-        <p>Exhaust: ${row[11]}</p>
-        <p>Forced Induction: ${row[12]}, Stage ${row[13]}</p>
-        <p>Internals: ${row[14]}</p>
-        <p>Block: ${row[15]}</p>
+        <p>Brakes: ${tune.brakes}</p>
+        <p>Weight Reduction: ${tune.weightreduction}</p>
+        <p>Injectors: ${tune.injectors}</p>
+        <p>ECU: ${tune.ecu}</p>
+        <p>Intake: ${tune.intake}</p>
+        <p>Exhaust: ${tune.exhaust}</p>
+        <p>Forced Induction: ${tune.forcedinduction}, Stage ${tune[tune.forcedinduction] ? tune[tune.forcedinduction] : 0}</p>
+        <p>Internals: ${tune.internals}</p>
+        <p>Block: ${tune.block}</p>
       </div>
       <div class="column">
         <h3>Tuning</h3>
-        <p>Brake Bias: ${row[16]}</p>
-        <p>Steering Aggressiveness: ${row[17]}</p>
-        <p>Steering Ratio: ${row[18]}</p>
-        <p>Front Offset: ${row[19]}</p>
-        <p>Rear Offset: ${row[20]}</p>
-        <p>Front Height: ${row[21]}</p>
-        <p>Front Camber: ${row[22]}</p>
-        <p>Rear Height: ${row[23]}</p>
-        <p>Rear Camber: ${row[24]}</p>
-        <p>Front Dampening: ${row[25]}</p>
-        <p>Front Stiffness: ${row[26]}</p>
-        <p>Rear Dampening: ${row[27]}</p>
-        <p>Rear Stiffness: ${row[28]}</p>
-        <p>Final Drive: ${row[29]}</p>
-        <p>Gear 1: ${row[30]}</p>
-        <p>Gear 2: ${row[31]}</p>
-        <p>Gear 3: ${row[32]}</p>
-        <p>Gear 4: ${row[33]}</p>
-        <p>Gear 5: ${row[34]}</p>
-        <p>Gear 6: ${row[35]}</p>
-        <p>Gear 7: ${row[36]}</p>
-        <p>Gear 8: ${row[37]}</p>
-        <p>Gear 9: ${row[38]}</p>
-        <p>Gear 10: ${row[39]}</p>
+        <p>Brake Bias: ${tune.brakebias}</p>
+        <p>Steering Aggressiveness: ${tune.aggressiveness}</p>
+        <p>Steering Ratio: ${tune.ratio}</p>
+        <p>Front Offset: ${tune.foffset}</p>
+        <p>Rear Offset: ${tune.roffset}</p>
+        <p>Front Height: ${tune.fheight}</p>
+        <p>Front Camber: ${tune.fcamber}</p>
+        <p>Rear Height: ${tune.rheight}</p>
+        <p>Rear Camber: ${tune.rcamber}</p>
+        <p>Front Dampening: ${tune.fdamp}</p>
+        <p>Front Stiffness: ${tune.fstiff}</p>
+        <p>Rear Dampening: ${tune.rdamp}</p>
+        <p>Rear Stiffness: ${tune.rstiff}</p>
+        <p>Final Drive: ${tune.finaldrive}</p>
+        <p>Gear 1: ${tune.gear1}</p>
+        <p>Gear 2: ${tune.gear2}</p>
+        <p>Gear 3: ${tune.gear3}</p>
+        <p>Gear 4: ${tune.gear4}</p>
+        <p>Gear 5: ${tune.gear5}</p>
+        <p>Gear 6: ${1}</p>
+        <p>Gear 7: ${1}</p>
+        <p>Gear 8: ${1}</p>
+        <p>Gear 9: ${1}</p>
+        <p>Gear 10: ${1}</p>
       </div>
     </div>
   `;
+  document.querySelector('#tune-container .backbutton').addEventListener('click', () => displayTunes(tunes));
+  document.querySelector('#tune-container .tuner-viewer').addEventListener('click', () => gotoTuner(tuneDesc.carID.replace(/ /g, '_'), tuneDesc.tuneCode));
 }
 
-// Initialize the page when loaded
-window.addEventListener("load", () => {
-  loadData();
-});
+function gotoTuner(carID, tuneCode) {
+  window.location.href = `tuner.html?carID=${carID}&tuneCode=${tuneCode}`;
+}
